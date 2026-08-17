@@ -1,0 +1,43 @@
+# Default detection policy — loaded by the `config` crate.
+#
+# Per the architecture spec, policy lives HERE, not hardcoded in Rust.
+# Editing this file changes proxy behavior without a rebuild.
+#
+# NOTE: this file is not wired up to policy-engine yet (it's still using
+# hardcoded defaults). Wiring it up is a tracked next step.
+
+[rules.aws_access_key]
+risk = 100
+action = "block"
+
+[rules.openai_api_key]
+risk = 100
+action = "block"
+
+[rules.github_token]
+risk = 100
+action = "block"
+
+[rules.private_key]
+risk = 100
+action = "block"
+
+[rules.db_connection_string]
+risk = 100
+action = "block"
+
+[rules.jwt_token]
+risk = 80
+action = "redact"
+
+[rules.bearer_token]
+risk = 80
+action = "redact"
+
+[rules.credential_keyword]
+risk = 50
+action = "redact"
+
+[thresholds]
+block_at = 100
+redact_at = 50

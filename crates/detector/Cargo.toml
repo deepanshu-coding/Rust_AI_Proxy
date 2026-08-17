@@ -1,0 +1,9 @@
+[package]
+name = "detector"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+common = { path = "../common" }
+fancy-regex = "0.13"
+once_cell = "1"

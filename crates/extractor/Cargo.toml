@@ -1,0 +1,8 @@
+[package]
+name = "extractor"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+common = { path = "../common" }
+thiserror.workspace = true

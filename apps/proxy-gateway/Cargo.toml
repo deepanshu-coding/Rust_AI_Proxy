@@ -1,0 +1,18 @@
+[package]
+name = "proxy-gateway"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+common = { path = "../../crates/common" }
+extractor = { path = "../../crates/extractor" }
+detector = { path = "../../crates/detector" }
+policy-engine = { path = "../../crates/policy-engine" }
+config = { path = "../../crates/config" }
+ai-engine = { path = "../../crates/ai-engine" }
+logger = { path = "../../crates/logger" }
+metrics = { path = "../../crates/metrics" }
+interceptor = { path = "../../crates/interceptor" }
+tokio.workspace = true
+tracing.workspace = true
+serde_json.workspace = true

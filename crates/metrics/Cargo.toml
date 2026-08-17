@@ -1,0 +1,8 @@
+[package]
+name = "metrics"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+common = { path = "../common" }
+serde.workspace = true
