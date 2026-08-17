@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>D.P Sharma — Security Proxy Dashboard</title>
+<title>D.P Sharma — AI-Proxy Dashboard</title>
 <style>
 :root{
   --bg:#090c12; --panel:#111720; --panel2:#0c121a; --line:#293341;
@@ -68,8 +68,8 @@ code{color:#68d8c5}
   <hr>
 
   <section id="dashboard" class="active-section">
-    <h1>Security Overview</h1>
-    <p class="sub">Real-time proxy interception and policy decisions</p>
+    <h1>Security Dashboard</h1>
+    <p class="sub">Real-time proxy Interception and Policy decisions</p>
 
     <div class="grid">
       <div class="card"><div class="label">Total Requests</div><div id="total" class="value">0</div><div class="small">Intercepted traffic</div></div>
@@ -80,7 +80,7 @@ code{color:#68d8c5}
       <div class="card"><div class="label">Warnings</div><div id="warned" class="value cyan">0</div><div class="small">Policy warnings</div></div>
       <div class="card"><div class="label">Avg Risk Score</div><div id="risk" class="value">0</div><div class="small">Current observed traffic</div></div>
       <div class="card"><div class="label">Events</div><div id="eventsCount" class="value">0</div><div class="small">Recent audit events</div></div>
-      <div class="card"><div class="label">API Status</div><div id="apiStatus" class="value green">—</div><div class="small">REST backend</div></div>
+      <div class="card"><div class="label">API Status</div><div id="apiStatus" class="value green">—</div><div class="small">Backend</div></div>
 
       <div class="card wide market">
         <div class="panel-title">LIVE TRAFFIC · PROXY</div>
@@ -94,7 +94,7 @@ code{color:#68d8c5}
 
   <section id="activity">
     <h1>Activity Logs</h1>
-    <p class="sub">Live inspection and policy decisions from the REST backend</p>
+    <p class="sub">Live inspection and policy decisions from the backend</p>
     <div class="toolbar">
       <input id="search" placeholder="Search host / detector..." oninput="renderEvents()">
       <select id="decisionFilter" onchange="renderEvents()">
@@ -112,14 +112,14 @@ code{color:#68d8c5}
 
   <section id="config">
     <h1>Configuration</h1>
-    <p class="sub">REST API connection settings</p>
+    <p class="sub">API connection settings</p>
     <div class="card config">
-      <div><div class="label">REST Backend</div><div style="font-size:21px;margin-top:8px"><code id="apiBaseDisplay"></code></div></div>
+      <div><div class="label">Backend</div><div style="font-size:21px;margin-top:8px"><code id="apiBaseDisplay"></code></div></div>
       <br>
-      <div><div class="label">Expected endpoints</div></div>
+      <div><div class="label">Endpoints</div></div>
       <div><code>GET /api/stats</code> — counters and risk metrics</div>
       <div><code>GET /api/events</code> — recent inspection events</div>
-      <div style="margin-top:15px;color:#697689">Change <code>API_BASE</code> near the bottom of this HTML if your Rust REST server uses another port.</div>
+      <div style="margin-top:15px;color:#697689">Rust-Based <code>AI-Proxy</code> for Data Leak Prevention.</div>
     </div>
   </section>
 </div>
