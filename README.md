@@ -1,34 +1,29 @@
-# CDP Proxy — Rust Edition (Secure Web Gateway + DLP)
+# Rust based AI-Proxy (UI + Secure Web Gateway + DLP)
 
 This is the **enterprise evolution** of the original Python/FastAPI `cdp-proxy`
-content scanner — same detection philosophy (Regex + Keyword + future SLM,
+content scanner - same detection philosophy (Regex + Keyword + future SLM,
 Allow/Redact/Block policy), rebuilt as a **transparent, system-wide Windows
 network interceptor** instead of an API endpoint clients call manually.
 
-> The original Python repo remains untouched and is a working reference for
-> the detection logic being ported here. This is a separate, ground-up build —
-> not a migration — because the transport model (system-wide traffic capture
-> vs. an HTTP API) is fundamentally different.
-
 ---
 
-## Current Status: Phase 4 — Windows System Proxy Registration ✅
+## Current Status: Phase 4 - Windows System Proxy Registration 
 
 As of this commit:
 
-- ✅ Full Cargo workspace compiles cleanly (`cargo build`)
-- ✅ All 81 unit + integration tests pass (`cargo test`)
-- ✅ Full MITM pipeline verified in-process:
+  -  Full Cargo workspace compiles cleanly (`cargo build`)
+  -  All 81 unit + integration tests pass (`cargo test`)
+  -  Full MITM pipeline verified in-process:
   - TLS termination (client ↔ proxy)
   - Upstream TLS client (proxy ↔ server)
   - Detection: RegexDetector + KeywordDetector (8 regex patterns + credential keywords)
   - Policy: BLOCK → 403 (upstream never reached), REDACT → sanitised forward, ALLOW → passthrough
   - Integration test: AWS key in HTTPS request → 403, upstream received nothing ✓
-- ✅ `interceptor::system_proxy` — WinINet registry + `InternetSetOption` notification.
+  -  `interceptor::system_proxy` - WinINet registry + `InternetSetOption` notification.
   Windows deps are `cfg`-gated so Linux build is clean. Returns clear error on non-Windows.
-- ✅ Complete CLI: `generate-ca`, `install-cert`, `uninstall-cert`, `enable-proxy`,
+  -  Complete CLI: `generate-ca`, `install-cert`, `uninstall-cert`, `enable-proxy`,
   `disable-proxy`, `status`, `start`, `stop`
-- ⚠️ **Pending your Windows confirmation (cannot verify from this sandbox):**
+  -  **Pending your Windows confirmation (cannot verify from this sandbox):**
   - `install-cert` → "EnaLisis CDP Proxy Root CA" appears in `certmgr.msc`
   - `enable-proxy` → Windows Settings → Network → Proxy shows `127.0.0.1:8888`
   - Browser HTTPS → no cert warning, green padlock, traffic flows through proxy
@@ -77,21 +72,21 @@ Requires Rust stable — install via `rustup` from https://rustup.rs
 
 ## Roadmap
 
-1. ✅ Phase 1 — plain HTTP proxy (TCP listener, CONNECT tunneling)
-2. ✅ Phase 2 — root CA generation + per-domain leaf cert signing (openssl-verified)
-3. ✅ Phase 2b — `install-cert` / `uninstall-cert` CLI (logic verified; Windows confirmation pending)
-4. ✅ Phase 3a — TLS termination module (`tls.rs`), full handshake test in-process
-5. ✅ Phase 3b — MITM wired into live proxy (`handle_connect_mitm`)
-6. ✅ Phase 3c — Detection pipeline wired: RegexDetector + KeywordDetector + PolicyEngine
+1.  Phase 1 — plain HTTP proxy (TCP listener, CONNECT tunneling)
+2.  Phase 2 — root CA generation + per-domain leaf cert signing (openssl-verified)
+3.  Phase 2b — `install-cert` / `uninstall-cert` CLI (logic verified; Windows confirmation pending)
+4.  Phase 3a — TLS termination module (`tls.rs`), full handshake test in-process
+5.  Phase 3b — MITM wired into live proxy (`handle_connect_mitm`)
+6.  Phase 3c — Detection pipeline wired: RegexDetector + KeywordDetector + PolicyEngine
    inline in HTTPS stream; BLOCK test verified end-to-end
-7. ✅ Phase 4 — Windows system proxy: `enable-proxy` / `disable-proxy` CLI; `start` / `stop`
+7.  Phase 4 — Windows system proxy: `enable-proxy` / `disable-proxy` CLI; `start` / `stop`
    one-shot commands; `status` dashboard (Windows behavior pending your confirmation)
-8. ⬜ Phase 5 (future) — WFP kernel callout driver for bypass-resistant capture
-9. ⬜ Response body inspection (currently only request is inspected)
-10. ⬜ Structured audit log events per request (tracing logs exist; structured JSON per-request pending)
-11. ⬜ `extractor` crate — PDF, DOCX, image OCR for file-upload inspection
-12. ⬜ `config` crate — load `policies/*.toml` into PolicyEngine (thresholds currently hardcoded)
-13. ⬜ Dashboard — web UI for live traffic / metrics / alerts
+8.  Phase 5 (future) — WFP kernel callout driver for bypass-resistant capture
+9.  Response body inspection (currently only request is inspected)
+10.  Structured audit log events per request (tracing logs exist; structured JSON per-request pending)
+11.  `extractor` crate — PDF, DOCX, image OCR for file-upload inspection
+12.  `config` crate — load `policies/*.toml` into PolicyEngine (thresholds currently hardcoded)
+13.  Dashboard — web UI for live traffic / metrics / alerts
 
 
 ## Why Rust, Why Not Reuse the Python Proxy Directly
