@@ -1,0 +1,254 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>D.P Sharma — Security Proxy Dashboard</title>
+<style>
+:root{
+  --bg:#090c12; --panel:#111720; --panel2:#0c121a; --line:#293341;
+  --text:#e8edf5; --muted:#8490a2; --accent1:#12b8a6; --accent2:#167ff2;
+  --green:#12c99a; --red:#ff5364; --yellow:#f2b84b; --cyan:#29b9d6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif}
+.app{max-width:1100px;margin:auto;padding:28px 24px 50px}
+.brand{
+  font-size:40px;font-weight:700;letter-spacing:-1px;
+  background:linear-gradient(90deg,#19c7a8,#2387ef);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.nav{margin-top:24px;background:#182130;border-radius:32px;padding:7px;display:flex;gap:4px;overflow:auto}
+.nav button{border:0;background:transparent;color:#8f99a9;padding:14px 22px;border-radius:25px;font:inherit;font-size:20px;white-space:nowrap;cursor:pointer}
+.nav button.active{background:linear-gradient(135deg,#168cff,#0879e8);color:#fff;box-shadow:0 5px 18px #0879e844}
+.status{display:flex;align-items:center;gap:12px;margin:25px 2px 28px;color:#9ba5b5;font-size:18px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--green);box-shadow:0 0 12px #12c99a88}
+.dot.off{background:var(--red);box-shadow:0 0 12px #ff536488}
+hr{border:0;border-top:1px solid var(--line);margin:0 -24px 30px}
+section{display:none}.active-section{display:block}
+h1{font-size:31px;margin:0 0 5px}.sub{font-size:18px;color:var(--muted);margin:0 0 32px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.card{background:var(--panel);border:1px solid #2a3545;border-radius:28px;padding:25px;min-height:145px;box-shadow:0 10px 35px #00000022}
+.label{color:#8995a7;font-size:16px;text-transform:uppercase;letter-spacing:.5px}
+.value{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:31px;margin-top:18px}
+.green{color:var(--green)}.red{color:var(--red)}.yellow{color:var(--yellow)}.cyan{color:var(--cyan)}
+.small{color:#778396;font-size:15px;margin-top:9px}
+.wide{grid-column:span 4}
+.panel-title{font-size:22px;margin-bottom:18px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+input,select{background:#0b1119;border:1px solid #2a3545;color:#dfe7f1;border-radius:12px;padding:11px 13px;font:inherit}
+button.refresh{background:#147fea;border:0;color:white;border-radius:12px;padding:11px 16px;cursor:pointer}
+table{width:100%;border-collapse:collapse;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+th,td{text-align:left;padding:13px 10px;border-bottom:1px solid #202a37}
+th{color:#78869a;font-weight:500}.empty{text-align:center;color:#778396;padding:35px}
+.badge{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.badge.ALLOW{background:#12c99a22;color:var(--green)}.badge.BLOCK{background:#ff536422;color:var(--red)}
+.badge.REDACT{background:#f2b84b22;color:var(--yellow)}.badge.WARN{background:#29b9d622;color:var(--cyan)}
+.market{margin-top:55px}
+.market-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.market-cell{background:var(--panel2);border-radius:20px;padding:22px;text-align:center}
+.market-cell .value{font-size:23px}
+.config{line-height:1.8;color:#9ba5b5}
+code{color:#68d8c5}
+@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}.wide{grid-column:span 2}}
+@media(max-width:520px){.app{padding:20px 16px}.brand{font-size:34px}.grid{grid-template-columns:1fr}.wide{grid-column:span 1}.nav button{font-size:17px;padding:12px 15px}hr{margin-left:-16px;margin-right:-16px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brand">D.P Sharma</div>
+
+  <nav class="nav">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="activity">Activity Logs</button>
+    <button class="tab" data-tab="config">Configuration</button>
+  </nav>
+
+  <div class="status"><span id="statusDot" class="dot"></span><span id="statusText">Connecting</span><span id="lastUpdate">—</span></div>
+  <hr>
+
+  <section id="dashboard" class="active-section">
+    <h1>Security Overview</h1>
+    <p class="sub">Real-time proxy interception and policy decisions</p>
+
+    <div class="grid">
+      <div class="card"><div class="label">Total Requests</div><div id="total" class="value">0</div><div class="small">Intercepted traffic</div></div>
+      <div class="card"><div class="label">Allowed</div><div id="allowed" class="value green">0</div><div class="small">Passed by policy</div></div>
+      <div class="card"><div class="label">Blocked</div><div id="blocked" class="value red">0</div><div class="small">Prevented requests</div></div>
+      <div class="card"><div class="label">Redacted</div><div id="redacted" class="value yellow">0</div><div class="small">Sensitive data sanitized</div></div>
+
+      <div class="card"><div class="label">Warnings</div><div id="warned" class="value cyan">0</div><div class="small">Policy warnings</div></div>
+      <div class="card"><div class="label">Avg Risk Score</div><div id="risk" class="value">0</div><div class="small">Current observed traffic</div></div>
+      <div class="card"><div class="label">Events</div><div id="eventsCount" class="value">0</div><div class="small">Recent audit events</div></div>
+      <div class="card"><div class="label">API Status</div><div id="apiStatus" class="value green">—</div><div class="small">REST backend</div></div>
+
+      <div class="card wide market">
+        <div class="panel-title">LIVE TRAFFIC · PROXY</div>
+        <div class="market-grid">
+          <div class="market-cell"><div class="label">Endpoint</div><div id="endpoint" class="value">127.0.0.1:8080</div></div>
+          <div class="market-cell"><div class="label">Proxy</div><div class="value">127.0.0.1:8888</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="activity">
+    <h1>Activity Logs</h1>
+    <p class="sub">Live inspection and policy decisions from the REST backend</p>
+    <div class="toolbar">
+      <input id="search" placeholder="Search host / detector..." oninput="renderEvents()">
+      <select id="decisionFilter" onchange="renderEvents()">
+        <option value="">All decisions</option><option>ALLOW</option><option>BLOCK</option><option>REDACT</option><option>WARN</option>
+      </select>
+      <button class="refresh" onclick="refreshAll()">Refresh</button>
+    </div>
+    <div class="card wide" style="overflow:auto;padding:12px">
+      <table>
+        <thead><tr><th>TIME</th><th>HOST</th><th>DECISION</th><th>RISK</th><th>DETECTOR</th><th>LATENCY</th></tr></thead>
+        <tbody id="eventsBody"><tr><td colspan="6" class="empty">Waiting for events…</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="config">
+    <h1>Configuration</h1>
+    <p class="sub">REST API connection settings</p>
+    <div class="card config">
+      <div><div class="label">REST Backend</div><div style="font-size:21px;margin-top:8px"><code id="apiBaseDisplay"></code></div></div>
+      <br>
+      <div><div class="label">Expected endpoints</div></div>
+      <div><code>GET /api/stats</code> — counters and risk metrics</div>
+      <div><code>GET /api/events</code> — recent inspection events</div>
+      <div style="margin-top:15px;color:#697689">Change <code>API_BASE</code> near the bottom of this HTML if your Rust REST server uses another port.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+/*
+  REST API contract expected by this dashboard.
+
+  GET /api/stats
+  {
+    "total": 42,
+    "allowed": 28,
+    "blocked": 10,
+    "redacted": 4,
+    "warned": 0,
+    "avg_risk": 38
+  }
+
+  GET /api/events
+  [
+    {
+      "timestamp":"2026-08-18T12:30:20Z",
+      "host":"example.com",
+      "decision":"BLOCK",
+      "risk_score":160,
+      "detector":"regex",
+      "latency_ms":12
+    }
+  ]
+
+  The parser also accepts common alternate names such as
+  total_requests, requests, risk_score, decision, findings, etc.
+*/
+
+const API_BASE = "http://127.0.0.1:8080";
+const REFRESH_MS = 1500;
+let events = [];
+
+document.getElementById("apiBaseDisplay").textContent = API_BASE;
+document.getElementById("endpoint").textContent = API_BASE.replace(/^https?:\/\//,"");
+
+document.querySelectorAll(".tab").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll("section").forEach(x=>x.classList.remove("active-section"));
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active-section");
+  };
+});
+
+function num(o, ...keys){
+  for(const k of keys) if(o && o[k] !== undefined && o[k] !== null && !isNaN(Number(o[k]))) return Number(o[k]);
+  return 0;
+}
+function decisionOf(e){
+  return String(e?.decision ?? e?.action ?? e?.result ?? e?.policy_decision ?? "").toUpperCase();
+}
+function hostOf(e){return e?.host ?? e?.hostname ?? e?.destination ?? e?.url ?? "—"}
+function detectorOf(e){
+  if(Array.isArray(e?.detectors_triggered)) return e.detectors_triggered.join(", ");
+  if(Array.isArray(e?.detectors)) return e.detectors.join(", ");
+  if(Array.isArray(e?.findings)) return e.findings.join(", ");
+  return e?.detector ?? e?.analyzer ?? e?.rule ?? "—";
+}
+function timeOf(e){
+  const t=e?.timestamp ?? e?.time ?? e?.created_at;
+  if(!t) return "—";
+  const d=new Date(t); return isNaN(d) ? String(t) : d.toLocaleTimeString();
+}
+function setConnected(ok){
+  document.getElementById("statusDot").classList.toggle("off",!ok);
+  document.getElementById("statusText").textContent=ok?"Live":"Offline";
+  document.getElementById("apiStatus").textContent=ok?"ONLINE":"OFFLINE";
+  document.getElementById("apiStatus").className="value "+(ok?"green":"red");
+  document.getElementById("lastUpdate").textContent=ok?new Date().toLocaleTimeString():"—";
+}
+async function getJson(path){
+  const r=await fetch(API_BASE+path,{cache:"no-store"});
+  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+async function refreshStats(){
+  const s=await getJson("/api/stats");
+  document.getElementById("total").textContent=num(s,"total","total_requests","requests");
+  document.getElementById("allowed").textContent=num(s,"allowed","allow","allow_count");
+  document.getElementById("blocked").textContent=num(s,"blocked","block","block_count");
+  document.getElementById("redacted").textContent=num(s,"redacted","redact","redact_count");
+  document.getElementById("warned").textContent=num(s,"warned","warnings","warn","warn_count");
+  document.getElementById("risk").textContent=Math.round(num(s,"avg_risk","average_risk","risk_score","avg_risk_score"));
+}
+async function refreshEvents(){
+  const e=await getJson("/api/events");
+  events=Array.isArray(e)?e:(e.events ?? e.data ?? e.items ?? []);
+  document.getElementById("eventsCount").textContent=events.length;
+  renderEvents();
+}
+function renderEvents(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const f=document.getElementById("decisionFilter").value;
+  const rows=events.filter(e=>{
+    const d=decisionOf(e), h=hostOf(e).toLowerCase(), det=detectorOf(e).toLowerCase();
+    return (!f||d===f)&&(!q||h.includes(q)||det.includes(q));
+  });
+  const body=document.getElementById("eventsBody");
+  if(!rows.length){body.innerHTML='<tr><td colspan="6" class="empty">No matching events</td></tr>';return}
+  body.innerHTML=rows.slice(0,100).map(e=>{
+    const d=decisionOf(e)||"—";
+    const cls=["ALLOW","BLOCK","REDACT","WARN"].includes(d)?d:"";
+    return `<tr>
+      <td>${esc(timeOf(e))}</td><td>${esc(hostOf(e))}</td>
+      <td><span class="badge ${cls}">${esc(d)}</span></td>
+      <td>${esc(num(e,"risk_score","risk","score"))}</td>
+      <td>${esc(detectorOf(e))}</td>
+      <td>${esc(num(e,"latency_ms","latency","latencyMs"))} ms</td>
+    </tr>`;
+  }).join("");
+}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function refreshAll(){
+  try{
+    await Promise.all([refreshStats(),refreshEvents()]);
+    setConnected(true);
+  }catch(err){
+    setConnected(false);
+    console.warn("REST backend unavailable:",err);
+  }
+}
+refreshAll();
+setInterval(refreshAll,REFRESH_MS);
+</script>
+</body>
+</html>
